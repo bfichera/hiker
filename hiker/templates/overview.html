@@ -1,0 +1,51 @@
+<!doctype html>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<div class="card_0">
+    <div class="container">
+        <h4><b>{{ itinerary.name }}</b></h4>
+        <form action="{{ url_for('edit_title', itinerary_id=itinerary.id) }}" method="post">
+            <input type="submit" value="Edit">
+        </form>
+    </div>
+</div>
+{% for item in itinerary.traverse() %}
+<div class="card_{{ item.padx }}">
+    <div class="container">
+        <h4><b>{{ item.name }}</b></h4>
+        {% if item.id in routes %}
+        <p>Length: {{ item.length }}</p>
+        <p>Elevation change: {{ item.elevation_change}}</p>
+        <p>Has water: {{ item.has_water }}</p>
+        <p>Notes: {{ item.note }}</p>
+        {% endif %}
+        {% if item.id in stays %}
+        <p>Location: {{ item.site.location }}</p>
+        <p>Elevation: {{ item.site.elevation}}</p>
+        <p>Arrive: {{ item.event1.datetime.strftime('%A, %B %e %Y at %I:%M %p') }}</p>
+        <p>Depart: {{ item.event2.datetime.strftime('%A, %B %e %Y at %I:%M %p') }}</p>
+        <p>Has water: {{ item.site.has_water }}</p>
+        <p>Notes: {{ item.note }}</p>
+        {% endif %}
+        {% if item.id in trailheads %}
+        <p>Location: {{ item.site.location }}</p>
+        <p>Elevation: {{ item.site.elevation}}</p>
+        <p>Arrive: {{ item.datetime.strftime('%A, %B %e %Y at %I:%M %p') }}</p>
+        <p>Has water: {{ item.site.has_water }}</p>
+        <p>Notes: {{ item.note }}</p>
+        {% endif %}
+        <form action="{{ url_for('edit', itinerary_id=itinerary.id, id=item.id) }}" method="post">
+            <input type="submit" value="Edit">
+        </form>
+        {% if item.id in routes %}
+        <form action="{{ url_for('add', itinerary_id=itinerary.id, id=item.id) }}" method="post">
+            <input type="submit" value="Add new stay">
+        </form>
+        {% endif %}
+        {% if item.id in stays %}
+        <form action="{{ url_for('delete', itinerary_id=itinerary.id, id=item.id) }}" method="post">
+            <input type="submit" value="Delete">
+        </form>
+        {% endif %}
+    </div>
+</div> 
+{% endfor %}

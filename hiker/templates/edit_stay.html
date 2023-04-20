@@ -1,0 +1,28 @@
+<!doctype html>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<div class="card_2">
+    <div class="container">
+        <h4><b>Stay: {{ stay.site.name }}</b></h4>
+        <form method="post">
+            <label for="name">Name:</label><br>
+            <input type=text name="name" value="{{ stay.site.name }}"><br>
+            <label for="location">Location along route:</label><br>
+            <input type=text name="location" value="{{ stay.site.location }}"><br>
+            <label for="elevation">Elevation:</label><br>
+            <input type=text name="elevation" value="{{ stay.site.elevation }}"><br>
+            <label for="has_water">Has water:</label>
+            {% if stay.site.has_water %}
+            <input type=checkbox name="has_water" checked><br>
+            {% else %}
+            <input type=checkbox name="has_water"><br>
+            {% endif %}
+            <label for="arrive_time">Arrival:</label><br> 
+            <input type="datetime-local" name="arrive_time" value="{{ stay.event1.datetime.isoformat(timespec='seconds') }}"><br>
+            <label for="depart_time">Departure:</label><br>
+            <input type="datetime-local" name="depart_time" value="{{ stay.event2.datetime.isoformat(timespec='seconds') }}"><br>
+            <label for=note>Note</label><br>
+            <textarea name=note id=note>{{ stay.note }}</textarea><br>
+            <input type="submit" value="Submit"><br>
+        </form>
+    </div>
+</div>

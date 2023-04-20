@@ -1,0 +1,22 @@
+<!doctype html>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<div class="card_1">
+    <div class="container">
+        <h4><b>Route: {{ route.name }}</b></h4>
+        <p>Length: {{ route.length}}</p>
+        <p>Elevation change: {{ route.elevation_change }}</p>
+        <form method="post">
+            <label for="name">Name:</label><br>
+            <input type=text name="name" value="{{ route.name }}"><br>
+            <label for="has_water">Has water</label>
+            {% if route.has_water %}
+            <input type=checkbox name="has_water" checked><br>
+            {% else %}
+            <input type=checkbox name="has_water"><br>
+            {% endif %}
+            <label for=note>Note</label><br>
+            <textarea name=note id=note>{{ route.note }}</textarea><br>
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+</div>
