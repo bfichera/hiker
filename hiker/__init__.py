@@ -17,45 +17,6 @@ app = Flask(__name__)
 print('http://127.0.0.1:5000/new')
 
 
-def example_itinerary():
-    from dateparser import parse
-
-    from .logic import sites, events
-
-    # define sites
-    starttrailhead = sites.StartTrailhead(0)
-    endtrailhead = sites.EndTrailhead(100, 0)
-    campsite1 = sites.Site(10, 20, name='Campsite 1')
-    campsite2 = sites.Site(20, 200, name='Campsite 2')
-
-    # define events
-    starttrailhead_event = events.StartTrailheadEvent(
-        parse('in 10 days'),
-        starttrailhead,
-    )
-    endtrailhead_event = events.EndTrailheadEvent(
-        parse('in 17 days'),
-        endtrailhead,
-    )
-    stay1 = events.Stay(
-        campsite1,
-        parse('in 11 days'),
-        parse('in 12 days'),
-    )
-    stay2 = events.Stay(
-        campsite2,
-        parse('in 13 days'),
-        parse('in 14 days'),
-    )
-
-    itinerary = sites.Itinerary(
-        starttrailhead_event,
-        endtrailhead_event,
-        [stay1, stay2],
-    )
-    return itinerary
-
-
 def load_itinerary(itinerary_id):
     with open(Path(str(itinerary_id)+'.pkl'), 'rb') as fh:
         itinerary = pickle.load(fh)
