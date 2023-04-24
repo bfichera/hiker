@@ -90,9 +90,20 @@ class Route:
         self.id = uuid4()
         self.note = ''
         if name is None:
-            self.name = f'{self.site1.name} --> {self.site2.name}'
+            self.name = f'Trail from {self.site1.name} to {self.site2.name}'
         else:
             self.name = name
+
+    def entrylines(self):
+        result = []
+        result.append(f'--> {self.name}')
+        result.append(f'\tStart: {self.site1} (elevation: {self.site1.elevation})')
+        result.append(f'\tEnd: {self.site2} (elevation: {self.site2.elevation})')
+        result.append(f'\tDistance: {self.length}')
+        result.append(f'\tElevation change: {self.elevation_change}')
+        result.append(f'\tWater on route: {"yes" if self.has_water else "no"}')
+        result.append(f'\tNotes: {self.note}')
+        return result
 
     @property
     def length(self):

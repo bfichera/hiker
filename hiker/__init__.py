@@ -2,6 +2,8 @@ import pickle
 from pathlib import Path
 from datetime import datetime
 
+import yaml
+from appdirs import user_data_dir, user_config_dir
 from dateparser import parse
 from flask import (
     Flask,
@@ -12,19 +14,50 @@ from flask import (
 )
 
 from .logic import sites, events
+from .info import app_name
 
 app = Flask(__name__)
-print('http://127.0.0.1:5000/new')
+
+
+def make_default_cfg(file):
+    data_dir = Path(user_data_dir()) / app_name
+    if not data_dir.exists():
+        data_dir.mkdir()
+    cfg = {
+        'data_dir': str(data_dir.absolute()),
+    }
+    with open(file, 'w') as fh:
+        yaml.dump(cfg, fh)
+    return Path(file).exists()
+
+
+def get_cfg():
+    cfgdir = Path(user_config_dir()) / app_name
+    cfgfile = Path(user_config_dir()) / app_name / 'config.yaml'
+    if not cfgdir.exists():
+        cfgdir.mkdir(parents=True, exist_ok=True)
+    if not cfgfile.exists():
+        if not make_default_cfg(cfgfile):
+            raise IOError('Could not create config file')
+    with open(cfgfile, 'r') as fh:
+        return yaml.safe_load(fh)
+
+
+def get_data_dir():
+    cfg = get_cfg()
+    return Path(cfg['data_dir'])
 
 
 def load_itinerary(itinerary_id):
-    with open(Path(str(itinerary_id)+'.pkl'), 'rb') as fh:
+    data_dir = get_data_dir()
+    with open(data_dir / Path(str(itinerary_id)+'.pkl'), 'rb') as fh:
         itinerary = pickle.load(fh)
     return itinerary
 
 
 def dump_itinerary(itinerary):
-    with open(Path(str(itinerary.id)+'.pkl'), 'wb') as fh:
+    data_dir = get_data_dir()
+    with open(data_dir / Path(str(itinerary.id)+'.pkl'), 'wb') as fh:
         return pickle.dump(itinerary, fh)
 
 
@@ -52,6 +85,15 @@ def overview(itinerary_id):
             )
         ],
     )
+
+
+@app.route('/load', methods=['POST', 'GET'])
+def load():
+    itineraries = []
+    for path in get_data_dir().glob('*.pkl'):
+        itinerary_id = int(path.stem)
+        itineraries.append(load_itinerary(itinerary_id))
+    return render_template('load.html', itineraries=itineraries)
 
 
 @app.route('/add/<int:itinerary_id>/<int:id>', methods=['POST'])
@@ -86,6 +128,13 @@ def add_stay(itinerary_id, id):
             id=new_stay.id,
         ),
     )
+
+
+@app.route('/delete/itinerary/<int:itinerary_id>', methods=['POST'])
+def delete_itinerary(itinerary_id):
+    path = Path(get_data_dir()).absolute() / f'{itinerary_id}.pkl'
+    path.unlink()
+    return redirect(url_for('load'))
 
 
 @app.route('/delete/<int:itinerary_id>/<int:id>', methods=['POST'])
@@ -163,6 +212,10 @@ def edit_stay(itinerary_id, id):
                 stay.site.add_water()
         else:
             stay.site.remove_water()
+        if 'needs_permit' in request.form:
+            stay.needs_permit = True
+        else:
+            stay.needs_permit = False
         stay.site.name = request.form['name']
         if parse(request.form['arrive_time']) is not None:
             stay.event1.datetime = parse(request.form['arrive_time'])
@@ -247,3 +300,14 @@ def new():
     )
     dump_itinerary(itinerary)
     return redirect(url_for('overview', itinerary_id=itinerary.id))
+
+
+@app.route('/export/<int:itinerary_id>', methods=['POST', 'GET'])
+def export(itinerary_id):
+    itinerary = load_itinerary(itinerary_id)
+    result = ''
+    for item in itinerary.traverse():
+        for line in item.entrylines():
+            result += line+'\n'
+        result += '\n'
+    return render_template('export.html', result=result)

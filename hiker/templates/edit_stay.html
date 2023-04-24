@@ -16,6 +16,12 @@
             {% else %}
             <input type=checkbox name="has_water"><br>
             {% endif %}
+            <label for="needs_permit">Needs permit:</label>
+            {% if stay.needs_permit %}
+            <input type=checkbox name="needs_permit" checked><br>
+            {% else %}
+            <input type=checkbox name="needs_permit"><br>
+            {% endif %}
             <label for="arrive_time">Arrival:</label><br> 
             <input type="datetime-local" name="arrive_time" value="{{ stay.event1.datetime.isoformat(timespec='seconds') }}"><br>
             <label for="depart_time">Departure:</label><br>

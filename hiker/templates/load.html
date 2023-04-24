@@ -1,0 +1,18 @@
+<!doctype html>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<form action="{{ url_for('new') }}" method="post">
+    <input type="submit" value="New">
+</form>
+{% for itinerary in itineraries %}
+<div class="card_accent">
+    <div class="container">
+        <h4><b>{{ itinerary.name }}</b></h4>
+        <form action="{{ url_for('overview', itinerary_id=itinerary.id) }}" method="post">
+            <input type="submit" value="Load">
+        </form>
+        <form action="{{ url_for('delete_itinerary', itinerary_id=itinerary.id) }}" method="post">
+            <input type="submit" value="Delete">
+        </form>
+    </div>
+</div> 
+{% endfor %}

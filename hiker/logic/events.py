@@ -38,6 +38,15 @@ class StartTrailheadEvent(Event):
     def info(self):
         return self.site.info
 
+    def entrylines(self):
+        result = []
+        result.append(f'Start at: {self.site.name}')
+        result.append(f'\tElevation: {self.site.elevation}')
+        result.append(f'\tDepart: {self.datetime.strftime("%A, %B %e %Y at %I:%M %p")}')
+        result.append(f'\tHas water: {"yes" if self.site.has_water else "no"}')
+        result.append(f'\tNotes: {self.note}')
+        return result
+
 
 class EndTrailheadEvent(Event):
 
@@ -62,6 +71,15 @@ class EndTrailheadEvent(Event):
     @property
     def info(self):
         return self.site.info
+
+    def entrylines(self):
+        result = []
+        result.append(f'End at: {self.site.name}')
+        result.append(f'\tElevation: {self.site.elevation}')
+        result.append(f'\tArrive: {self.datetime.strftime("%A, %B %e %Y at %I:%M %p")}')
+        result.append(f'\tHas water: {"yes" if self.site.has_water else "no"}')
+        result.append(f'\tNotes: {self.note}')
+        return result
 
 
 class SiteArriveEvent(Event):
@@ -105,13 +123,14 @@ class SiteDepartEvent(Event):
 
 class Stay:
 
-    def __init__(self, site, arrive_datetime, depart_datetime, note=''):
+    def __init__(self, site, arrive_datetime, depart_datetime, note='', needs_permit=False):
         self.event1 = SiteArriveEvent(arrive_datetime, site)
         self.event2 = SiteDepartEvent(depart_datetime, site)
         self.site = site
         self.padx = 2
         self.id = uuid4()
         self.note = note
+        self.needs_permit = needs_permit
 
     @property
     def name(self):
@@ -144,4 +163,15 @@ class Stay:
     @depart_datetime.setter
     def depart_datetime(self, value):
         self.event2.datetime = value
+
+    def entrylines(self):
+        result = []
+        result.append(f'Stay at: {self.site.name}')
+        result.append(f'\tElevation: {self.site.elevation}')
+        result.append(f'\tHas water: {"yes" if self.site.has_water else "no"}')
+        result.append(f'\tNeeds permit: {"yes" if self.needs_permit else "no"}')
+        result.append(f'\tArrive: {self.arrive_datetime.strftime("%A, %B %e %Y at %I:%M %p")}')
+        result.append(f'\tDepart: {self.depart_datetime.strftime("%A, %B %e %Y at %I:%M %p")}')
+        result.append(f'\tNotes: {self.note}')
+        return result
 

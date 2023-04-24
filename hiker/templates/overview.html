@@ -1,10 +1,19 @@
 <!doctype html>
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-<div class="card_0">
+<div class="card_accent">
     <div class="container">
         <h4><b>{{ itinerary.name }}</b></h4>
         <form action="{{ url_for('edit_title', itinerary_id=itinerary.id) }}" method="post">
-            <input type="submit" value="Edit">
+            <input type="submit" value="Edit title">
+        </form>
+        <form action="{{ url_for('export', itinerary_id=itinerary.id) }}" method="post">
+            <input type="submit" value="Export">
+        </form>
+        <form action="{{ url_for('load') }}" method="post">
+            <input type="submit" value="Load">
+        </form>
+        <form action="{{ url_for('new', itinerary_id=itinerary.id) }}" method="post">
+            <input type="submit" value="New">
         </form>
     </div>
 </div>
@@ -15,7 +24,7 @@
         {% if item.id in routes %}
         <p>Length: {{ item.length }}</p>
         <p>Elevation change: {{ item.elevation_change}}</p>
-        <p>Has water: {{ item.has_water }}</p>
+        <p>Has water: {{ 'yes' if item.has_water else 'no' }}</p>
         <p>Notes: {{ item.note }}</p>
         {% endif %}
         {% if item.id in stays %}
@@ -23,14 +32,15 @@
         <p>Elevation: {{ item.site.elevation}}</p>
         <p>Arrive: {{ item.event1.datetime.strftime('%A, %B %e %Y at %I:%M %p') }}</p>
         <p>Depart: {{ item.event2.datetime.strftime('%A, %B %e %Y at %I:%M %p') }}</p>
-        <p>Has water: {{ item.site.has_water }}</p>
+        <p>Has water: {{ 'yes' if item.site.has_water else 'no' }}</p>
+        <p>Needs permit: {{ 'yes' if item.needs_permit else 'no' }}</p>
         <p>Notes: {{ item.note }}</p>
         {% endif %}
         {% if item.id in trailheads %}
         <p>Location: {{ item.site.location }}</p>
         <p>Elevation: {{ item.site.elevation}}</p>
         <p>Arrive: {{ item.datetime.strftime('%A, %B %e %Y at %I:%M %p') }}</p>
-        <p>Has water: {{ item.site.has_water }}</p>
+        <p>Has water: {{ 'yes' if item.site.has_water else 'no' }}</p>
         <p>Notes: {{ item.note }}</p>
         {% endif %}
         <form action="{{ url_for('edit', itinerary_id=itinerary.id, id=item.id) }}" method="post">
